@@ -3,8 +3,6 @@ package com.imageloader.mhlistener.imageloaderlib;
 import android.net.Uri;
 import android.view.View;
 
-import com.squareup.picasso.Callback;
-
 import java.io.File;
 
 /**
@@ -18,7 +16,7 @@ public class ImageLoader implements ILoaderStrategy {
 	private static volatile ImageLoader sInstance;
 
 	private ImageLoader() {
-		sLoader = new PicassoLoader();
+
 	}
 
 	//单例模式
@@ -35,7 +33,7 @@ public class ImageLoader implements ILoaderStrategy {
 	}
 
 	//提供实时替换图片加载框架的接口
-	public void setImageLoader(ILoaderStrategy loader) {
+	public static void setImageLoader(ILoaderStrategy loader) {
 		if (loader != null) {
 			sLoader = loader;
 		}
