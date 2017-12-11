@@ -43,6 +43,10 @@ public class LoaderOptions {
 		this.placeholder = builder.placeholder;
 	}
 
+	public static Builder builder(){
+		return new LoaderOptions.Builder();
+	}
+
 	public static final class Builder {
 		private int placeholderResId;
 		private int errorResId;
