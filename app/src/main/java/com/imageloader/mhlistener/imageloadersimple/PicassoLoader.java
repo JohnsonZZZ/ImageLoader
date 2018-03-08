@@ -1,6 +1,5 @@
 package com.imageloader.mhlistener.imageloadersimple;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -9,12 +8,9 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.imageloader.mhlistener.imageloaderlib.Callback;
+import com.imageloader.mhlistener.imageloaderlib.BitmapCallBack;
 import com.imageloader.mhlistener.imageloaderlib.ILoaderStrategy;
 import com.imageloader.mhlistener.imageloaderlib.LoaderOptions;
 import com.squareup.picasso.LruCache;
@@ -26,11 +22,9 @@ import com.squareup.picasso.Target;
 import com.squareup.picasso.Transformation;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 /**
- * 自行扩展ILoaderStrategy
+ * Created by JohnsonFan on 2017/6/27.
  */
 
 public class PicassoLoader implements ILoaderStrategy {
@@ -51,80 +45,6 @@ public class PicassoLoader implements ILoaderStrategy {
 
 
 	@Override
-	public void loadImage(View view, String url, LoaderOptions options) {
-		if (view instanceof ImageView) {
-			ImageView imageView = (ImageView) view;
-			RequestCreator requestCreator = getPicasso().load(url);
-			loadOptions(requestCreator, options).into(imageView);
-		}
-	}
-
-	@Override
-	public void loadImage(View view, int drawable, LoaderOptions options) {
-		if (view instanceof ImageView) {
-			ImageView imageView = (ImageView) view;
-			RequestCreator requestCreator = getPicasso().load(drawable);
-			loadOptions(requestCreator, options).into(imageView);
-		}
-	}
-
-	@Override
-	public void loadImage(View view, File file, LoaderOptions options) {
-		if (view instanceof ImageView) {
-			ImageView imageView = (ImageView) view;
-			RequestCreator requestCreator = getPicasso().load(file);
-			loadOptions(requestCreator, options).into(imageView);
-		}
-	}
-
-	@Override
-	public void loadImage(View view, Uri uri, LoaderOptions options) {
-		if (view instanceof ImageView) {
-			ImageView imageView = (ImageView) view;
-			RequestCreator requestCreator = getPicasso().load(uri);
-			loadOptions(requestCreator, options).into(imageView);
-		}
-	}
-
-	@Override
-	public void saveImage(String url, final File destFile, final Callback callback) {
-		getPicasso().load(url).into(new Target() {
-			@Override
-			public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-				try {
-					FileOutputStream outputStream = new FileOutputStream(destFile);
-					bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-					outputStream.close();
-					App.gApp.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(destFile)));
-					Toast.makeText(App.gApp, "图片保存成功", Toast.LENGTH_SHORT).show();
-					if (callback != null) {
-						callback.onSuccess();
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-					Toast.makeText(App.gApp, "图片保存失败", Toast.LENGTH_SHORT).show();
-					if (callback != null) {
-						callback.onError(e);
-					}
-				}
-			}
-
-			@Override
-			public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-				Toast.makeText(App.gApp, "图片保存失败", Toast.LENGTH_SHORT).show();
-				if (callback != null) {
-					callback.onError(e);
-				}
-			}
-
-			@Override
-			public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-			}
-		});
-	}
-
-	@Override
 	public void clearMemoryCache() {
 		sLruCache.clear();
 	}
@@ -133,14 +53,26 @@ public class PicassoLoader implements ILoaderStrategy {
 	public void clearDiskCache() {
 		File diskFile = new File(App.gApp.getCacheDir(), PICASSO_CACHE);
 		if (diskFile.exists()) {
-			//这边自行删除
+			//这边自行写删除代码
 //	        FileUtil.deleteFile(diskFile);
 		}
 	}
 
-	private RequestCreator loadOptions(RequestCreator requestCreator, LoaderOptions options) {
-		if (options == null) {
-			return requestCreator;
+	@Override
+	public void loadImage(LoaderOptions options) {
+		RequestCreator requestCreator = null;
+		if (options.url != null) {
+			requestCreator = getPicasso().load(options.url);
+		} else if (options.file != null) {
+			requestCreator = getPicasso().load(options.file);
+		}else if (options.drawableResId == 0) {
+			requestCreator = getPicasso().load(options.drawableResId);
+		} else if (options.uri != null){
+			requestCreator = getPicasso().load(options.uri);
+		}
+
+		if (requestCreator == null) {
+			throw new NullPointerException("requestCreator must not be null");
 		}
 		if (options.targetHeight > 0 && options.targetWidth > 0) {
 			requestCreator.resize(options.targetWidth, options.targetHeight);
@@ -171,7 +103,39 @@ public class PicassoLoader implements ILoaderStrategy {
 		if (options.degrees != 0) {
 			requestCreator.rotate(options.degrees);
 		}
-		return requestCreator;
+
+		if (options.targetView instanceof ImageView) {
+			requestCreator.into(((ImageView)options.targetView));
+		} else if (options.callBack != null){
+			requestCreator.into(new PicassoTarget(options.callBack));
+		}
+	}
+
+	class PicassoTarget implements Target {
+		BitmapCallBack callBack;
+
+		protected PicassoTarget(BitmapCallBack callBack) {
+			this.callBack = callBack;
+		}
+
+		@Override
+		public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+			if (this.callBack != null) {
+				this.callBack.onBitmapLoaded(bitmap);
+			}
+		}
+
+		@Override
+		public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+			if (this.callBack != null) {
+				this.callBack.onBitmapFailed(e);
+			}
+		}
+
+		@Override
+		public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+		}
 	}
 
 	class PicassoTransformation implements Transformation {
@@ -183,7 +147,7 @@ public class PicassoLoader implements ILoaderStrategy {
 
 		@Override
 		public Bitmap transform(Bitmap source) {
-			float roundPx = bitmapAngle;//角度
+			float roundPx = bitmapAngle;//圆角的横向半径和纵向半径
 			Bitmap output = Bitmap.createBitmap(source.getWidth(),
 					source.getHeight(), Bitmap.Config.ARGB_8888);
 			Canvas canvas = new Canvas(output);

@@ -17,6 +17,6 @@ public class App extends Application {
 		super.onCreate();
 		gApp = this;
 		//初始化图片库
-		ImageLoader.setImageLoader(new PicassoLoader());
+		ImageLoader.getInstance().setImageLoader(new PicassoLoader());
 	}
 }
