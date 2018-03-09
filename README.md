@@ -20,3 +20,21 @@ dependencies {
     implementation 'com.github.mhlistener:ImageLoader:1.0.3'
 }
 ```
+Step 3. Usage
+
+```
+//you can set custom loader in your application usually.
+ImageLoader.getInstance().setImageLoader(new PicassoLoader());
+
+//how to use
+ImageLoader.getInstance()
+				.load(url)
+				.angle(80)
+				.resize(400, 600)
+				.centerCrop()
+				.config(Bitmap.Config.RGB_565)
+				.placeholder(R.mipmap.test)
+				.error(R.mipmap.test)
+				.skipLocalCache(true)
+				.into(imageView);
+```
