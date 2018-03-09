@@ -27,14 +27,15 @@ Step 3. Usage
 ImageLoader.getInstance().setImageLoader(new PicassoLoader());
 
 //how to use
+
 ImageLoader.getInstance()
-				.load(url)
-				.angle(80)
-				.resize(400, 600)
-				.centerCrop()
-				.config(Bitmap.Config.RGB_565)
-				.placeholder(R.mipmap.test)
-				.error(R.mipmap.test)
-				.skipLocalCache(true)
-				.into(imageView);
+	.load(url)
+	.angle(80)
+	.resize(400, 600)
+	.centerCrop()
+	.config(Bitmap.Config.RGB_565)
+	.placeholder(R.mipmap.test)
+	.error(R.mipmap.test)
+	.skipLocalCache(true)
+	.into(imageView);
 ```
