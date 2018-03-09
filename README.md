@@ -27,7 +27,6 @@ Step 3. Usage
 ImageLoader.getInstance().setImageLoader(new PicassoLoader());
 
 //how to use
-
 ImageLoader.getInstance()
 	.load(url)
 	.angle(80)
