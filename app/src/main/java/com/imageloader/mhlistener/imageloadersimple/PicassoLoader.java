@@ -65,7 +65,7 @@ public class PicassoLoader implements ILoaderStrategy {
 			requestCreator = getPicasso().load(options.url);
 		} else if (options.file != null) {
 			requestCreator = getPicasso().load(options.file);
-		}else if (options.drawableResId == 0) {
+		}else if (options.drawableResId != 0) {
 			requestCreator = getPicasso().load(options.drawableResId);
 		} else if (options.uri != null){
 			requestCreator = getPicasso().load(options.uri);
