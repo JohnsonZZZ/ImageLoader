@@ -38,4 +38,4 @@ ImageLoader.getInstance()
 	.skipLocalCache(true)
 	.into(imageView);
 ```
-![](https://github.com/JohnsonZZZ/ImageLoader/tree/master/ScreenShot/326606564456037219.jpg)
+![](https://github.com/JohnsonZZZ/ImageLoader/raw/master/ScreenShot/326606564456037219.jpg)
