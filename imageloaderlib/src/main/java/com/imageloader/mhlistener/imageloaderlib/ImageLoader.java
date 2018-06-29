@@ -22,7 +22,6 @@ public class ImageLoader{
 		if (sInstance == null) {
 			synchronized (ImageLoader.class) {
 				if (sInstance == null) {
-					//若切换其它图片加载框架，可以实现一键替换
 					sInstance = new ImageLoader();
 				}
 			}
@@ -30,15 +29,15 @@ public class ImageLoader{
 		return sInstance;
 	}
 
-	//提供实时替换图片加载框架的接口
-	public void setImageLoader(ILoaderStrategy loader) {
-		if (loader != null) {
-			sLoader = loader;
-		}
+	/**
+	 * 提供全局替换图片加载框架的接口，若切换其它框架，可以实现一键全局替换
+	 */
+	public void setGlobalImageLoader(ILoaderStrategy loader) {
+		sLoader = loader;
 	}
 
-	public LoaderOptions load(String path) {
-		return new LoaderOptions(path);
+	public LoaderOptions load(String url) {
+		return new LoaderOptions(url);
 	}
 
 	public LoaderOptions load(int drawable) {
@@ -53,15 +52,32 @@ public class ImageLoader{
 		return new LoaderOptions(uri);
 	}
 
+	/**
+	 * 优先使用实时设置的图片loader，其次使用全局设置的图片loader
+	 * @param options
+	 */
 	public void loadOptions(LoaderOptions options) {
-		sLoader.loadImage(options);
+		if (options.loader != null) {
+			options.loader.loadImage(options);
+		} else {
+			checkNotNull();
+			sLoader.loadImage(options);
+		}
 	}
 
 	public void clearMemoryCache() {
+		checkNotNull();
 		sLoader.clearMemoryCache();
 	}
 
 	public void clearDiskCache() {
+		checkNotNull();
 		sLoader.clearDiskCache();
+	}
+
+	private void checkNotNull() {
+		if (sLoader == null) {
+			throw new NullPointerException("you must be set your imageLoader at first!");
+		}
 	}
 }

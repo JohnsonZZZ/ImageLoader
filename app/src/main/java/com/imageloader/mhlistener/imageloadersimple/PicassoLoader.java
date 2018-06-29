@@ -43,7 +43,6 @@ public class PicassoLoader implements ILoaderStrategy {
 		return sPicassoSingleton;
 	}
 
-
 	@Override
 	public void clearMemoryCache() {
 		sLruCache.clear();

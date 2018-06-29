@@ -31,6 +31,7 @@ public class LoaderOptions {
 	public File file;
 	public int drawableResId;
 	public Uri uri;
+	public ILoaderStrategy loader;//实时切换图片加载库
 
 	public LoaderOptions(String url) {
 		this.url = url;
@@ -56,6 +57,11 @@ public class LoaderOptions {
 	public void bitmap(BitmapCallBack callBack) {
 		this.callBack = callBack;
 		ImageLoader.getInstance().loadOptions(this);
+	}
+
+	public LoaderOptions loader(ILoaderStrategy imageLoader) {
+		this.loader = imageLoader;
+		return this;
 	}
 
 	public LoaderOptions placeholder(@DrawableRes int placeholderResId) {

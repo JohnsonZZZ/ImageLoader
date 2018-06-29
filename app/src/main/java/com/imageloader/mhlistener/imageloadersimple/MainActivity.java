@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 				.placeholder(R.mipmap.test)
 				.error(R.mipmap.test)
 				.skipLocalCache(true)
+				.rotate(0)
 				.into(imageView);
 
 	}
