@@ -24,7 +24,7 @@ Step 3. Usage
 
 ```
 //you can set custom loader in your application usually.
-ImageLoader.getInstance().setImageLoader(new PicassoLoader());
+ImageLoader.getInstance().setGlobalImageLoader(new PicassoLoader());
 
 //how to use
 ImageLoader.getInstance()
