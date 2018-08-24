@@ -17,7 +17,7 @@ allprojects {
 Step 2. Add the dependency
 ```
 dependencies {
-    implementation 'com.github.mhlistener:ImageLoader:1.0.5'
+    implementation 'com.github.mhlistener:ImageLoader:<lastest.version>'
 }
 ```
 Step 3. Usage
